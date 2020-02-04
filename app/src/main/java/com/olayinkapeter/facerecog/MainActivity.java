@@ -1,12 +1,9 @@
 package com.olayinkapeter.facerecog;
 
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -14,7 +11,6 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -23,12 +19,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
-import android.os.Bundle;
 import android.util.SparseArray;
-import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.face.Face;
@@ -45,18 +37,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         imageView = findViewById(R.id.imgview);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent pickPhoto = new Intent(Intent.ACTION_PICK,
                         android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(pickPhoto , 1);
+                startActivityForResult(pickPhoto , 0);
             }
         });
     }
@@ -75,16 +67,6 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 break;
-            case 1:
-                if(resultCode == RESULT_OK){
-                    Uri selectedImage = imageReturnedIntent.getData();
-                    try {
-                        setUpFaceDetector(selectedImage);
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    }
-                }
-                break;
         }
     }
 
@@ -97,19 +79,8 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-//        try {
-//            InputStream inputStream = getContentResolver().openInputStream(yourUri);
-//            yourDrawable = Drawable.createFromStream(inputStream, yourUri.toString() );
-//        } catch (FileNotFoundException e) {
-//            yourDrawable = getResources().getDrawable(R.drawable.default_image);
-//        }
-
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inMutable=true;
-//        Bitmap myBitmap = BitmapFactory.decodeResource(
-//                getApplicationContext().getResources(),
-//                R.drawable.no_face,
-//                options);
 
         InputStream ims = getContentResolver().openInputStream(selectedImage);
 
@@ -145,13 +116,13 @@ public class MainActivity extends AppCompatActivity {
         imageView.setImageDrawable(new BitmapDrawable(getResources(),tempBitmap));
 
         if (faces.size() < 1) {
-            Toast.makeText(this, "Hey, there's no face in this photo. You think this is a joke?", Toast.LENGTH_LONG).show();
+            new AlertDialog.Builder(this).setMessage("Hey, there's no face in this photo. You think this is a joke?").show();
         }
         else if (faces.size() == 1) {
-            Toast.makeText(this, "Okay. Thank you!", Toast.LENGTH_LONG).show();
+            new AlertDialog.Builder(this).setMessage("Okay. Thank you!").show();
         }
         else if (faces.size() > 1) {
-            Toast.makeText(this, "Hey, there's more than one face in this photo. Bet why?", Toast.LENGTH_LONG).show();
+            new AlertDialog.Builder(this).setMessage("Hey, there's more than one face in this photo. Bet why?").show();
         }
     }
 
